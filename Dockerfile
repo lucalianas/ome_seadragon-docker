@@ -3,21 +3,27 @@ LABEL maintainer="luca.lianas@crs4.it"
 
 USER root
 
-RUN yum -y install gcc-c++ openslide wget unzip python3-devel \
+RUN yum -y install gcc-c++ openslide wget unzip python3-devel git \
     && curl -sL https://rpm.nodesource.com/setup_10.x | bash - \
     && yum -y install nodejs \
     && npm install -g grunt
 
-ARG OME_SEADRAGON_VERSION=0.7.1
+ARG OME_SEADRAGON_BRANCH=tiledb_as_dzi
 
 RUN mkdir /opt/ome_web_plugins/ \
-    && wget https://github.com/crs4/ome_seadragon/archive/v${OME_SEADRAGON_VERSION}.zip -P /opt/ome_web_plugins/ \
-    && unzip /opt/ome_web_plugins/v${OME_SEADRAGON_VERSION}.zip -d /opt/ome_web_plugins/ \
-    && mv /opt/ome_web_plugins/ome_seadragon{-${OME_SEADRAGON_VERSION},} \
-    && rm /opt/ome_web_plugins/v${OME_SEADRAGON_VERSION}.zip \
-    && chown -R omero-web /opt/ome_web_plugins/
+    && chown -R omero-web /opt/ome_web_plugins
+WORKDIR /opt/ome_web_plugins
+
+USER omero-web
+
+RUN git clone https://github.com/lucalianas/ome_seadragon.git
 
 WORKDIR /opt/ome_web_plugins/ome_seadragon/
+
+RUN git checkout ${OME_SEADRAGON_BRANCH} \
+    && rm -rf .git
+
+USER root
 
 RUN /opt/omero/web/venv3/bin/pip install --upgrade -r requirements.txt
 
