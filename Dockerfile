@@ -25,7 +25,8 @@ RUN git checkout ${OME_SEADRAGON_BRANCH} \
 
 USER root
 
-RUN /opt/omero/web/venv3/bin/pip install --upgrade -r requirements.txt
+RUN /opt/omero/web/venv3/bin/pip install --upgrade pip \
+    && /opt/omero/web/venv3/bin/pip install --upgrade -r requirements.txt
 
 USER omero-web
 
